@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useActor } from "./useActor";
-import type { Clip } from "../backend.d.ts";
+import type { Clip, ClipRequest } from "../backend.d.ts";
 
 export function useGetAllClips() {
   const { actor, isFetching } = useActor();
@@ -89,6 +89,43 @@ export function useDeleteClip() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["clips"] });
+    },
+  });
+}
+
+export function useGetAllClipRequests() {
+  const { actor, isFetching } = useActor();
+  return useQuery<ClipRequest[]>({
+    queryKey: ["clipRequests"],
+    queryFn: async () => {
+      if (!actor) return [];
+      return actor.getAllClipRequests();
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+export function useSubmitClipRequest() {
+  const queryClient = useQueryClient();
+  const { actor } = useActor();
+
+  return useMutation({
+    mutationFn: async (params: {
+      title: string;
+      animeName: string;
+      description: string;
+      requesterContact: string;
+    }) => {
+      if (!actor) throw new Error("Actor not initialized");
+      return actor.submitClipRequest(
+        params.title,
+        params.animeName,
+        params.description,
+        params.requesterContact
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["clipRequests"] });
     },
   });
 }

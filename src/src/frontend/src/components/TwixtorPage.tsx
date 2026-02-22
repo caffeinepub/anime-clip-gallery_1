@@ -1,12 +1,45 @@
+import { useState, useEffect } from "react";
 import { Sparkles, Play, Info, Upload, Zap } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
 import { UploadForm } from "./UploadForm";
-import { useGetAllCategories } from "../hooks/useQueries";
+import { SearchBar } from "./SearchBar";
+import { ClipCard } from "./ClipCard";
+import { VideoPlayerModal } from "./VideoPlayerModal";
+import { useGetClipsByCategory, useGetAllCategories } from "../hooks/useQueries";
+import type { Clip } from "../backend.d.ts";
 
 export function TwixtorPage() {
   const { data: categories = [] } = useGetAllCategories();
+  const { data: twixtorClips = [], isLoading } = useGetClipsByCategory("twixtor");
+  const [searchText, setSearchText] = useState("");
+  const [selectedClip, setSelectedClip] = useState<Clip | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchText);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchText]);
+
+  // Filter clips by search text
+  const filteredClips = debouncedSearch
+    ? twixtorClips.filter(
+        (clip) =>
+          clip.title.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+          clip.animeName.toLowerCase().includes(debouncedSearch.toLowerCase())
+      )
+    : twixtorClips;
+
+  const handleClipClick = (clip: Clip) => {
+    setSelectedClip(clip);
+    setModalOpen(true);
+  };
 
   return (
     <div className="space-y-12">
@@ -80,6 +113,71 @@ export function TwixtorPage() {
           </p>
         </CardContent>
       </Card>
+
+      {/* Twixtor Clips Gallery */}
+      <div className="space-y-6">
+        <div className="space-y-4 rounded-2xl border border-primary/20 bg-card/60 backdrop-blur-lg shadow-glow-white-lg p-6">
+          <h2 className="text-2xl font-display font-bold bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
+            Browse Twixtor Clips
+          </h2>
+          <SearchBar 
+            value={searchText} 
+            onChange={setSearchText} 
+            placeholder="Search Twixtor clips..."
+          />
+          
+          {/* Results count */}
+          {!isLoading && filteredClips.length > 0 && (
+            <div className="flex items-center justify-between px-2">
+              <p className="text-sm text-muted-foreground">
+                <span className="text-primary font-bold">{filteredClips.length}</span> {filteredClips.length === 1 ? "clip" : "clips"} found
+                {debouncedSearch && ` for "${debouncedSearch}"`}
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Clips Grid */}
+        {isLoading ? (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="space-y-3 animate-fade-in" style={{ animationDelay: `${i * 50}ms` }}>
+                <Skeleton className="aspect-video w-full rounded-lg" />
+                <Skeleton className="h-5 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
+              </div>
+            ))}
+          </div>
+        ) : filteredClips.length === 0 ? (
+          <div className="flex min-h-[400px] flex-col items-center justify-center space-y-4 rounded-lg border-2 border-dashed border-border/50 bg-card/30 p-12 text-center">
+            <div className="rounded-full bg-muted p-6">
+              <Sparkles className="h-12 w-12 text-muted-foreground" />
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-xl font-semibold text-card-foreground">
+                {debouncedSearch ? "No matching clips found" : "No Twixtor clips yet"}
+              </h3>
+              <p className="text-muted-foreground">
+                {debouncedSearch
+                  ? "Try a different search term"
+                  : "Upload the first Twixtor clip using the form above!"}
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {filteredClips.map((clip, index) => (
+              <div
+                key={clip.id.toString()}
+                className="animate-fade-in"
+                style={{ animationDelay: `${index * 50}ms` }}
+              >
+                <ClipCard clip={clip} onClick={() => handleClipClick(clip)} />
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* What is Twixtor Info */}
       <Alert className="border-secondary/50 bg-gradient-to-br from-secondary/10 via-card to-accent/10 backdrop-blur-sm shadow-glow-blue">
@@ -166,8 +264,7 @@ export function TwixtorPage() {
               <div>
                 <h3 className="font-bold text-lg mb-2">Browse Twixtor Clips</h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Return to the home page and filter clips by the "twixtor" category to see all
-                  Twixtor-enhanced videos in the gallery
+                  Scroll up on this page to see all Twixtor-enhanced videos in the gallery section
                 </p>
               </div>
             </div>
@@ -176,8 +273,8 @@ export function TwixtorPage() {
               <div>
                 <h3 className="font-bold text-lg mb-2">Upload Twixtor Clips</h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  When uploading a new clip, select or type "twixtor" as the category to add it to
-                  this special collection
+                  When uploading a new clip, select "twixtor" as the category to add it to
+                  this dedicated Twixtor gallery
                 </p>
               </div>
             </div>
@@ -255,12 +352,15 @@ export function TwixtorPage() {
             Ready to Explore?
           </h2>
           <p className="text-lg text-muted-foreground mb-6 max-w-2xl mx-auto">
-            Head back to the home page and filter by "twixtor" to see all the stunning slow-motion
+            Scroll up to browse all Twixtor clips in the gallery, or upload your own stunning slow-motion
             anime clips
           </p>
           <Badge className="shadow-glow-xl text-lg px-6 py-3 font-display">Twixtor Category Available</Badge>
         </div>
       </div>
+
+      {/* Video Player Modal */}
+      <VideoPlayerModal clip={selectedClip} open={modalOpen} onOpenChange={setModalOpen} />
     </div>
   );
 }

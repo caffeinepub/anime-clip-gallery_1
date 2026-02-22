@@ -19,6 +19,15 @@ export interface Clip {
   'videoUrl' : string,
   'uploadDate' : Time,
 }
+export interface ClipRequest {
+  'id' : bigint,
+  'status' : string,
+  'title' : string,
+  'description' : string,
+  'animeName' : string,
+  'requesterContact' : string,
+  'requestDate' : Time,
+}
 export type Time = bigint;
 export interface _CaffeineStorageCreateCertificateResult {
   'method' : string,
@@ -49,10 +58,17 @@ export interface _SERVICE {
   '_caffeineStorageUpdateGatewayPrincipals' : ActorMethod<[], undefined>,
   'addClip' : ActorMethod<[string, string, string, string, string], Clip>,
   'deleteClip' : ActorMethod<[bigint], boolean>,
+  'deleteClipRequest' : ActorMethod<[bigint], boolean>,
   'getAllCategories' : ActorMethod<[], Array<string>>,
+  'getAllClipRequests' : ActorMethod<[], Array<ClipRequest>>,
   'getAllClips' : ActorMethod<[], Array<Clip>>,
   'getClipsByCategory' : ActorMethod<[string], Array<Clip>>,
   'searchClips' : ActorMethod<[string], Array<Clip>>,
+  'submitClipRequest' : ActorMethod<
+    [string, string, string, string],
+    ClipRequest
+  >,
+  'updateRequestStatus' : ActorMethod<[bigint, string], [] | [ClipRequest]>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

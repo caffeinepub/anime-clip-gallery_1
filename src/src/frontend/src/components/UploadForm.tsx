@@ -215,11 +215,16 @@ export function UploadForm({ categories }: UploadFormProps) {
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat} value={cat}>
-                      {cat}
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="english">english</SelectItem>
+                  <SelectItem value="japanese">japanese</SelectItem>
+                  <SelectItem value="twixtor">twixtor</SelectItem>
+                  {categories
+                    .filter((cat) => !["english", "japanese", "twixtor"].includes(cat))
+                    .map((cat) => (
+                      <SelectItem key={cat} value={cat}>
+                        {cat}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
             </div>

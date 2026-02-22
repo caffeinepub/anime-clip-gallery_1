@@ -82,9 +82,9 @@ export default {
         glow: "0 0 24px -4px oklch(var(--primary)), 0 0 12px -2px oklch(var(--primary))",
         "glow-lg": "0 0 48px -8px oklch(var(--primary)), 0 0 24px -4px oklch(var(--primary))",
         "glow-xl": "0 0 64px -8px oklch(var(--primary)), 0 0 32px -4px oklch(var(--primary)), 0 0 16px 0 oklch(var(--primary) / 0.5)",
-        "glow-pink": "0 0 24px -4px oklch(0.68 0.32 340), 0 0 12px -2px oklch(0.68 0.32 340)",
-        "glow-blue": "0 0 24px -4px oklch(0.62 0.30 240), 0 0 12px -2px oklch(0.62 0.30 240)",
-        "glow-purple": "0 0 24px -4px oklch(0.65 0.35 290), 0 0 12px -2px oklch(0.65 0.35 290)",
+        "glow-white": "0 0 24px -4px oklch(0.98 0 0), 0 0 12px -2px oklch(0.98 0 0)",
+        "glow-white-lg": "0 0 48px -8px oklch(0.98 0 0), 0 0 24px -4px oklch(0.98 0 0)",
+        "glow-white-xl": "0 0 64px -8px oklch(0.98 0 0), 0 0 32px -4px oklch(0.98 0 0), 0 0 16px 0 oklch(0.98 0 0 / 0.5)",
       },
       keyframes: {
         "accordion-down": {

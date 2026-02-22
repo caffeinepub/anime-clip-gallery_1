@@ -24,9 +24,10 @@ export function CategoryFilter({
     );
   }
 
-  // Merge predefined categories with dynamic ones
-  const predefinedCategories = ["eng", "japanese"];
-  const allCategories = [...predefinedCategories, ...categories];
+  // Merge predefined categories with dynamic ones, exclude twixtor
+  const predefinedCategories = ["english", "japanese"];
+  const filteredCategories = categories.filter(cat => cat !== "twixtor");
+  const allCategories = [...predefinedCategories, ...filteredCategories];
 
   return (
     <Tabs value={selectedCategory || "all"} className="w-full">

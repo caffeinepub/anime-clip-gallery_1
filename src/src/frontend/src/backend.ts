@@ -98,6 +98,15 @@ export interface Clip {
     videoUrl: string;
     uploadDate: Time;
 }
+export interface ClipRequest {
+    id: bigint;
+    status: string;
+    title: string;
+    description: string;
+    animeName: string;
+    requesterContact: string;
+    requestDate: Time;
+}
 export interface _CaffeineStorageCreateCertificateResult {
     method: string;
     blob_hash: string;
@@ -119,12 +128,16 @@ export interface backendInterface {
     _caffeineStorageUpdateGatewayPrincipals(): Promise<void>;
     addClip(title: string, animeName: string, category: string, videoUrl: string, thumbnailUrl: string): Promise<Clip>;
     deleteClip(clipId: bigint): Promise<boolean>;
+    deleteClipRequest(requestId: bigint): Promise<boolean>;
     getAllCategories(): Promise<Array<string>>;
+    getAllClipRequests(): Promise<Array<ClipRequest>>;
     getAllClips(): Promise<Array<Clip>>;
     getClipsByCategory(category: string): Promise<Array<Clip>>;
     searchClips(searchText: string): Promise<Array<Clip>>;
+    submitClipRequest(title: string, animeName: string, description: string, requesterContact: string): Promise<ClipRequest>;
+    updateRequestStatus(requestId: bigint, newStatus: string): Promise<ClipRequest | null>;
 }
-import type { _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
+import type { ClipRequest as _ClipRequest, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
     async _caffeineStorageBlobIsLive(arg0: Uint8Array): Promise<boolean> {
@@ -239,6 +252,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async deleteClipRequest(arg0: bigint): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deleteClipRequest(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deleteClipRequest(arg0);
+            return result;
+        }
+    }
     async getAllCategories(): Promise<Array<string>> {
         if (this.processError) {
             try {
@@ -250,6 +277,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.getAllCategories();
+            return result;
+        }
+    }
+    async getAllClipRequests(): Promise<Array<ClipRequest>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAllClipRequests();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAllClipRequests();
             return result;
         }
     }
@@ -295,6 +336,34 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async submitClipRequest(arg0: string, arg1: string, arg2: string, arg3: string): Promise<ClipRequest> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.submitClipRequest(arg0, arg1, arg2, arg3);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.submitClipRequest(arg0, arg1, arg2, arg3);
+            return result;
+        }
+    }
+    async updateRequestStatus(arg0: bigint, arg1: string): Promise<ClipRequest | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateRequestStatus(arg0, arg1);
+                return from_candid_opt_n8(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateRequestStatus(arg0, arg1);
+            return from_candid_opt_n8(this._uploadFile, this._downloadFile, result);
+        }
+    }
 }
 function from_candid__CaffeineStorageRefillResult_n4(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: __CaffeineStorageRefillResult): _CaffeineStorageRefillResult {
     return from_candid_record_n5(_uploadFile, _downloadFile, value);
@@ -303,6 +372,9 @@ function from_candid_opt_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Ar
     return value.length === 0 ? null : value[0];
 }
 function from_candid_opt_n7(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [bigint]): bigint | null {
+    return value.length === 0 ? null : value[0];
+}
+function from_candid_opt_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_ClipRequest]): ClipRequest | null {
     return value.length === 0 ? null : value[0];
 }
 function from_candid_record_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {

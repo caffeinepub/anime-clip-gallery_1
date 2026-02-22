@@ -1,67 +1,52 @@
 # Anime Clip Gallery
 
 ## Current State
+The application has a working upload form that allows users to upload anime clips with metadata. The category dropdown currently shows "english" and "japanese" as the first two options, followed by dynamically fetched categories from the backend. When clips are uploaded, they all appear on the home page regardless of category.
 
-The application is a video clip gallery for anime content with the following features:
-- Black background theme with cyberpunk Neo-Tokyo aesthetic
-- Home page with hero banner, search, and category filters (eng/japanese)
-- Donation page with payment information
-- Twixtor page with informational content about Twixtor effects
-- Upload capability via a modal form in the header
-- Video player modal for watching clips
-- Dark mode with purple/cyan accent colors
+The Twixtor page is a dedicated informational page that explains Twixtor effects and includes an upload form, but uploads from this page still route clips to the home page.
 
 ## Requested Changes (Diff)
 
 ### Add
-- Upload form directly on the Twixtor page (not just in header)
-- Aesthetic anime editor theme with:
-  - Gradient backgrounds with pink, purple, blue tones
-  - Glowing neon accents and borders
-  - Film grain or noise texture overlays
-  - Enhanced visual effects (shadows, glows, blurs)
-  - Editor-focused color palette (darker backgrounds, vibrant UI elements)
-  - Typography that feels modern and editor-centric
+- Add "twixtor" as the third category option in the upload form dropdown (after "english" and "japanese")
+- Add filtering logic to separate regular clips from Twixtor clips based on category
+- Add Twixtor clip display on the Twixtor page with grid layout similar to home page
+- Add dedicated state and queries for fetching Twixtor-specific clips
 
 ### Modify
-- Global color scheme to match anime editor aesthetic:
-  - Darker backgrounds (near-black with subtle gradients)
-  - Neon accent colors (hot pink, electric blue, purple)
-  - Glowing effects on interactive elements
-  - More pronounced shadows and depth
-- Twixtor page to include upload functionality
-- Overall visual theme to feel like a professional video editing tool
+- Update `UploadForm.tsx` to include "twixtor" in the hardcoded category options
+- Update `TwixtorPage.tsx` to display clips with category "twixtor" instead of just showing informational content
+- Update `App.tsx` to handle Twixtor page data fetching and state management for Twixtor clips
 
 ### Remove
 - None
 
 ## Implementation Plan
 
-1. Update color tokens in `index.css` to reflect anime editor aesthetic:
-   - Darker backgrounds with gradient overlays
-   - Neon pink, blue, purple accent colors
-   - Enhanced glow effects
+### Backend
+No backend changes needed - the existing `getClipsByCategory` API already supports filtering by "twixtor" category.
 
-2. Modify `tailwind.config.js` to add:
-   - Film grain/noise background patterns
-   - Additional glow shadow variants
-   - Editor-themed font choices
+### Frontend
+1. **Update UploadForm component**:
+   - Add "twixtor" as third SelectItem in category dropdown
+   - Keep the ordering: english, japanese, twixtor, then dynamic categories
 
-3. Update `TwixtorPage.tsx`:
-   - Add upload form component directly on the page
-   - Restyle with enhanced visual effects
-   - Maintain informational content
+2. **Update TwixtorPage component**:
+   - Accept props for clips data, loading state, search/filter capabilities
+   - Add clips grid display section below the upload section
+   - Reuse ClipCard component for consistent display
+   - Add search bar and category filter specific to Twixtor page
+   - Show empty state when no Twixtor clips exist
 
-4. Update global styles for enhanced aesthetic:
-   - Add background overlays with gradients
-   - Enhance border glow effects
-   - Add subtle animations
+3. **Update App component**:
+   - Add state management for Twixtor page (search, filters)
+   - Add query to fetch clips by "twixtor" category when on Twixtor page
+   - Pass clips data and handlers to TwixtorPage component
+   - Ensure Twixtor clips are excluded from home page by filtering
 
 ## UX Notes
-
-- The aesthetic anime editor theme should feel like professional editing software (Adobe Premiere, DaVinci Resolve) but with anime/cyberpunk flair
-- Neon colors should be vibrant but not overwhelming
-- Upload form on Twixtor page should be prominent and easy to use
-- Maintain readability despite darker theme
-- Smooth transitions and subtle animations throughout
-- Film grain or noise texture should be subtle, adding character without being distracting
+- When users upload with "twixtor" category, clips should only appear on the Twixtor page, not on home
+- The Twixtor page should function as a dedicated gallery for Twixtor clips with its own search/filter
+- Upload form behavior remains the same - users can upload from anywhere (header or Twixtor page)
+- Maintain the neon black/white aesthetic with consistent card styles
+- Empty state on Twixtor page should encourage users to upload first Twixtor clip

@@ -29,6 +29,15 @@ export const Clip = IDL.Record({
   'videoUrl' : IDL.Text,
   'uploadDate' : Time,
 });
+export const ClipRequest = IDL.Record({
+  'id' : IDL.Nat,
+  'status' : IDL.Text,
+  'title' : IDL.Text,
+  'description' : IDL.Text,
+  'animeName' : IDL.Text,
+  'requesterContact' : IDL.Text,
+  'requestDate' : Time,
+});
 
 export const idlService = IDL.Service({
   '_caffeineStorageBlobIsLive' : IDL.Func(
@@ -63,10 +72,22 @@ export const idlService = IDL.Service({
       [],
     ),
   'deleteClip' : IDL.Func([IDL.Nat], [IDL.Bool], []),
+  'deleteClipRequest' : IDL.Func([IDL.Nat], [IDL.Bool], []),
   'getAllCategories' : IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
+  'getAllClipRequests' : IDL.Func([], [IDL.Vec(ClipRequest)], ['query']),
   'getAllClips' : IDL.Func([], [IDL.Vec(Clip)], ['query']),
   'getClipsByCategory' : IDL.Func([IDL.Text], [IDL.Vec(Clip)], ['query']),
   'searchClips' : IDL.Func([IDL.Text], [IDL.Vec(Clip)], ['query']),
+  'submitClipRequest' : IDL.Func(
+      [IDL.Text, IDL.Text, IDL.Text, IDL.Text],
+      [ClipRequest],
+      [],
+    ),
+  'updateRequestStatus' : IDL.Func(
+      [IDL.Nat, IDL.Text],
+      [IDL.Opt(ClipRequest)],
+      [],
+    ),
 });
 
 export const idlInitArgs = [];
@@ -92,6 +113,15 @@ export const idlFactory = ({ IDL }) => {
     'category' : IDL.Text,
     'videoUrl' : IDL.Text,
     'uploadDate' : Time,
+  });
+  const ClipRequest = IDL.Record({
+    'id' : IDL.Nat,
+    'status' : IDL.Text,
+    'title' : IDL.Text,
+    'description' : IDL.Text,
+    'animeName' : IDL.Text,
+    'requesterContact' : IDL.Text,
+    'requestDate' : Time,
   });
   
   return IDL.Service({
@@ -127,10 +157,22 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'deleteClip' : IDL.Func([IDL.Nat], [IDL.Bool], []),
+    'deleteClipRequest' : IDL.Func([IDL.Nat], [IDL.Bool], []),
     'getAllCategories' : IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
+    'getAllClipRequests' : IDL.Func([], [IDL.Vec(ClipRequest)], ['query']),
     'getAllClips' : IDL.Func([], [IDL.Vec(Clip)], ['query']),
     'getClipsByCategory' : IDL.Func([IDL.Text], [IDL.Vec(Clip)], ['query']),
     'searchClips' : IDL.Func([IDL.Text], [IDL.Vec(Clip)], ['query']),
+    'submitClipRequest' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Text, IDL.Text],
+        [ClipRequest],
+        [],
+      ),
+    'updateRequestStatus' : IDL.Func(
+        [IDL.Nat, IDL.Text],
+        [IDL.Opt(ClipRequest)],
+        [],
+      ),
   });
 };
 

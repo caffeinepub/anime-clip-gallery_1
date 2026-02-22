@@ -11,6 +11,8 @@ import Iter "mo:core/Iter";
 import Nat "mo:core/Nat";
 import MixinStorage "blob-storage/Mixin";
 
+
+
 actor {
   include MixinStorage();
 
@@ -30,8 +32,27 @@ actor {
     };
   };
 
+  type ClipRequest = {
+    id : Nat;
+    title : Text;
+    animeName : Text;
+    description : Text;
+    requesterContact : Text;
+    status : Text; // "pending", "approved", "completed", "rejected"
+    requestDate : Time.Time;
+  };
+
+  module ClipRequest {
+    public func compareByRequestDateDesc(a : ClipRequest, b : ClipRequest) : Order.Order {
+      Int.compare(b.requestDate, a.requestDate);
+    };
+  };
+
   let clips = Map.empty<Nat, Clip>();
-  var nextId = 0;
+  var nextClipId = 0;
+
+  let clipRequests = Map.empty<Nat, ClipRequest>();
+  var nextRequestId = 0;
 
   func addCategory(category : Text) {
     let exists = clips.values().any(
@@ -53,8 +74,8 @@ actor {
     videoUrl : Text,
     thumbnailUrl : Text,
   ) : async Clip {
-    let id = nextId;
-    nextId += 1;
+    let id = nextClipId;
+    nextClipId += 1;
 
     let newClip : Clip = {
       id;
@@ -126,6 +147,56 @@ actor {
     let existed = clips.containsKey(clipId);
     if (existed) {
       clips.remove(clipId);
+    };
+    existed;
+  };
+
+  public shared ({ caller }) func submitClipRequest(
+    title : Text,
+    animeName : Text,
+    description : Text,
+    requesterContact : Text,
+  ) : async ClipRequest {
+    let id = nextRequestId;
+    nextRequestId += 1;
+
+    let newRequest : ClipRequest = {
+      id;
+      title;
+      animeName;
+      description;
+      requesterContact;
+      status = "pending";
+      requestDate = Time.now();
+    };
+
+    clipRequests.add(id, newRequest);
+    newRequest;
+  };
+
+  public query ({ caller }) func getAllClipRequests() : async [ClipRequest] {
+    clipRequests.values().toArray().sort(
+      ClipRequest.compareByRequestDateDesc
+    );
+  };
+
+  public shared ({ caller }) func updateRequestStatus(requestId : Nat, newStatus : Text) : async ?ClipRequest {
+    switch (clipRequests.get(requestId)) {
+      case (null) {
+        null;
+      };
+      case (?existingRequest) {
+        let updatedRequest = { existingRequest with status = newStatus };
+        clipRequests.add(requestId, updatedRequest);
+        ?updatedRequest;
+      };
+    };
+  };
+
+  public shared ({ caller }) func deleteClipRequest(requestId : Nat) : async Bool {
+    let existed = clipRequests.containsKey(requestId);
+    if (existed) {
+      clipRequests.remove(requestId);
     };
     existed;
   };
